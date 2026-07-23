@@ -19,6 +19,8 @@ pub fn export_seed_env(seed: u64) {
     unsafe {
         std::env::set_var("IDLE_RENDER_SEED", seed.to_string());
         std::env::set_var("TRANCE_SEED", seed.to_string());
+        // Offline export must write frames/ffmpeg pipes outside Landlock lockdown.
+        std::env::set_var("TRANCE_DISABLE_SANDBOX", "1");
     }
 }
 
