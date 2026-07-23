@@ -1,0 +1,17 @@
+[package]
+name = "idle-render"
+version = "0.1.0"
+edition = "2021"
+license = "Apache-2.0"
+description = "Offline IdleScreen effect renderer — simulation to video frames"
+repository = "https://github.com/idlescreen/idle-render"
+readme = "README.md"
+keywords = ["idlescreen", "screensaver", "av1", "render"]
+categories = ["command-line-utilities", "multimedia"]
+
+[[bin]]
+name = "idle-render"
+path = "src/main.rs"
+
+[dependencies]
+clap = { version = "4", features = ["derive"] }
