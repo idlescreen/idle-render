@@ -1,6 +1,8 @@
+use crate::audio::mux_audio_bed;
 use crate::encode::{encode_raw_bgra_to_file, EncodeBackend};
 use crate::error::RenderError;
 use crate::models::RenderJob;
+use crate::segment::{concat_segments, plan_segments};
 use std::path::PathBuf;
 use std::time::Duration;
 use trance_runner::plugin_session::PluginSession;
@@ -11,6 +13,7 @@ pub struct PipelineResult {
     pub frames: u64,
     pub output: PathBuf,
     pub dry_run: bool,
+    pub segments: u32,
 }
 
 /// Export seed env vars so plugins using [`trance_api::LcgRng::from_env_or_random`] match.
@@ -19,13 +22,11 @@ pub fn export_seed_env(seed: u64) {
     unsafe {
         std::env::set_var("IDLE_RENDER_SEED", seed.to_string());
         std::env::set_var("TRANCE_SEED", seed.to_string());
-        // Offline export must write frames/ffmpeg pipes outside Landlock lockdown.
         std::env::set_var("TRANCE_DISABLE_SANDBOX", "1");
     }
 }
 
 fn resolve_plugin(job: &RenderJob) -> Result<PluginSession, RenderError> {
-    // Force CPU path for headless determinism.
     if let Some(path) = &job.plugin_path {
         return PluginSession::load_path_with_options(path, Some(false), Some(1.0))
             .map_err(|e| RenderError::Plugin(e.to_string()));
@@ -39,7 +40,38 @@ fn resolve_plugin(job: &RenderJob) -> Result<PluginSession, RenderError> {
     .map_err(|e| RenderError::Plugin(e.to_string()))
 }
 
-/// Run the offline simulation and encode loop.
+#[allow(clippy::too_many_arguments)]
+fn encode_one(
+    session: &mut PluginSession,
+    cols: usize,
+    rows: usize,
+    width: u32,
+    height: u32,
+    fps: u32,
+    frames_total: u64,
+    frame_offset: u64,
+    output: &std::path::Path,
+    backend: EncodeBackend,
+) -> Result<u64, RenderError> {
+    let dt = Duration::from_secs_f64(1.0 / f64::from(fps));
+    let mut index = 0u64;
+    let iter = std::iter::from_fn(|| {
+        if index >= frames_total {
+            return None;
+        }
+        session.tick(dt);
+        let pixels = session.render(cols, rows, width, height);
+        index += 1;
+        let global = frame_offset + index;
+        if global.is_multiple_of(30) || index == frames_total {
+            tracing::info!(frame = global, "render progress");
+        }
+        Some(Ok(pixels))
+    });
+    encode_raw_bgra_to_file(backend, width, height, fps, output, iter)
+}
+
+/// Run the offline simulation and encode loop (optional segments + audio).
 pub fn run_pipeline(
     job: &RenderJob,
     backend: EncodeBackend,
@@ -47,12 +79,14 @@ pub fn run_pipeline(
     job.validate()?;
     export_seed_env(job.seed);
 
+    let plans = plan_segments(job)?;
     let frames_total = job.frame_count();
     if job.dry_run {
         return Ok(PipelineResult {
             frames: frames_total,
             output: job.output.clone(),
             dry_run: true,
+            segments: plans.len() as u32,
         });
     }
 
@@ -67,29 +101,49 @@ pub fn run_pipeline(
     session.init(cols, rows);
     session.set_simulation_rate(job.fps as f32);
 
-    let dt = Duration::from_secs_f64(1.0 / f64::from(job.fps));
-    let width = job.width;
-    let height = job.height;
-    let mut index = 0u64;
+    let mut written = 0u64;
+    let mut frame_offset = 0u64;
+    let mut part_paths = Vec::new();
+    for plan in &plans {
+        let part_frames = {
+            let secs = plan.duration.as_secs_f64();
+            let n = (secs * f64::from(job.fps)).floor() as u64;
+            n.max(1)
+        };
+        let n = encode_one(
+            &mut session,
+            cols,
+            rows,
+            job.width,
+            job.height,
+            job.fps,
+            part_frames,
+            frame_offset,
+            &plan.path,
+            backend,
+        )?;
+        written += n;
+        frame_offset += part_frames;
+        part_paths.push(plan.path.clone());
+        tracing::info!(segment = plan.index, frames = n, path = %plan.path.display(), "segment done");
+    }
 
-    let iter = std::iter::from_fn(|| {
-        if index >= frames_total {
-            return None;
-        }
-        session.tick(dt);
-        let pixels = session.render(cols, rows, width, height);
-        index += 1;
-        if index.is_multiple_of(30) || index == frames_total {
-            tracing::info!(frame = index, total = frames_total, "render progress");
-        }
-        Some(Ok(pixels))
-    });
+    if part_paths.len() > 1 {
+        concat_segments(&part_paths, &job.output)?;
+    } else if part_paths.len() == 1 && part_paths[0] != job.output {
+        // should not happen for unsegmented
+        concat_segments(&part_paths, &job.output)?;
+    }
 
-    let written = encode_raw_bgra_to_file(backend, width, height, job.fps, &job.output, iter)?;
+    if let Some(audio) = &job.audio {
+        mux_audio_bed(&job.output, audio, &job.output)?;
+    }
+
     Ok(PipelineResult {
         frames: written,
         output: job.output.clone(),
         dry_run: false,
+        segments: plans.len() as u32,
     })
 }
 
@@ -99,22 +153,25 @@ mod tests {
     use std::time::Duration;
 
     #[test]
-    fn dry_run_reports_frame_count() {
+    fn dry_run_reports_frame_count_and_segments() {
         let job = RenderJob {
             effect: "beams".into(),
             plugin_path: None,
             seed: 42,
             fps: 30,
-            duration: Duration::from_secs(1),
+            duration: Duration::from_secs(120),
             width: 64,
             height: 64,
             output: PathBuf::from("/tmp/unused.mkv"),
             cols: None,
             rows: None,
             dry_run: true,
+            segment: Some(Duration::from_secs(60)),
+            audio: None,
         };
         let r = run_pipeline(&job, EncodeBackend::RawDump).expect("dry");
-        assert_eq!(r.frames, 30);
+        assert_eq!(r.frames, 3600);
+        assert_eq!(r.segments, 2);
         assert!(r.dry_run);
     }
 }

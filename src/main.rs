@@ -24,11 +24,12 @@ fn main() -> ExitCode {
 
     if job.dry_run {
         eprintln!(
-            "dry-run: effect={} seed={} fps={} frames={} {}x{} -> {}",
+            "dry-run: effect={} seed={} fps={} frames={} segments={} {}x{} -> {}",
             job.effect,
             job.seed,
             job.fps,
             job.frame_count(),
+            job.segment_count(),
             job.width,
             job.height,
             job.output.display()
@@ -38,8 +39,9 @@ fn main() -> ExitCode {
     match run_pipeline(&job, backend) {
         Ok(r) => {
             eprintln!(
-                "idle-render: wrote {} frame(s) to {}{}",
+                "idle-render: wrote {} frame(s) in {} segment(s) to {}{}",
                 r.frames,
+                r.segments,
                 r.output.display(),
                 if r.dry_run { " (dry-run)" } else { "" }
             );

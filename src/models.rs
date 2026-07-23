@@ -28,6 +28,10 @@ pub struct RenderJob {
     pub cols: Option<usize>,
     pub rows: Option<usize>,
     pub dry_run: bool,
+    /// When set, encode in chunks of this length then concat.
+    pub segment: Option<Duration>,
+    /// Optional audio bed muxed after video (loop/shorten to video length).
+    pub audio: Option<PathBuf>,
 }
 
 impl RenderJob {
@@ -38,6 +42,22 @@ impl RenderJob {
         }
         let n = (secs * f64::from(self.fps)).floor() as u64;
         n.max(1)
+    }
+
+    /// Number of segment files for a segmented encode (1 if no segment).
+    pub fn segment_count(&self) -> u64 {
+        let Some(seg) = self.segment else {
+            return 1;
+        };
+        if seg.is_zero() {
+            return 1;
+        }
+        let total = self.duration.as_secs_f64();
+        let part = seg.as_secs_f64();
+        if part <= 0.0 {
+            return 1;
+        }
+        ((total / part).ceil() as u64).max(1)
     }
 
     pub fn validate(&self) -> Result<(), RenderError> {
@@ -58,6 +78,19 @@ impl RenderJob {
         if self.output.as_os_str().is_empty() {
             return Err(RenderError::Job("output path required".into()));
         }
+        if let Some(seg) = self.segment {
+            if seg.is_zero() {
+                return Err(RenderError::Job("segment duration must be > 0".into()));
+            }
+            if seg >= self.duration {
+                // single segment is fine — treat as unsegmented
+            }
+        }
+        if let Some(a) = &self.audio {
+            if !a.as_os_str().is_empty() && a.extension().is_none() {
+                // allow extensionless; only reject empty
+            }
+        }
         Ok(())
     }
 }
@@ -65,7 +98,6 @@ impl RenderJob {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use std::time::Duration;
 
     fn sample() -> RenderJob {
         RenderJob {
@@ -80,12 +112,22 @@ mod tests {
             cols: None,
             rows: None,
             dry_run: true,
+            segment: None,
+            audio: None,
         }
     }
 
     #[test]
     fn frame_count_one_second_30fps() {
         assert_eq!(sample().frame_count(), 30);
+    }
+
+    #[test]
+    fn segment_count_two_hours_hourly() {
+        let mut j = sample();
+        j.duration = Duration::from_secs(7200);
+        j.segment = Some(Duration::from_secs(3600));
+        assert_eq!(j.segment_count(), 2);
     }
 
     #[test]

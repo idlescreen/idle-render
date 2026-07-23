@@ -31,6 +31,14 @@ pub struct Args {
     #[arg(long, default_value = "10s")]
     pub duration: String,
 
+    /// Optional segment length for long encodes (e.g. 1h)
+    #[arg(long)]
+    pub segment: Option<String>,
+
+    /// Optional audio bed (muxed after video; looped/cut to fit)
+    #[arg(long)]
+    pub audio: Option<PathBuf>,
+
     /// Output path (.mkv recommended)
     #[arg(long, short = 'o')]
     pub output: PathBuf,
@@ -63,6 +71,10 @@ pub struct Args {
 impl Args {
     pub fn into_job(self) -> Result<(RenderJob, EncodeBackend), RenderError> {
         let duration = parse_duration_secs(&self.duration)?;
+        let segment = match self.segment {
+            Some(s) => Some(parse_duration_secs(&s)?),
+            None => None,
+        };
         let job = RenderJob {
             effect: self.effect,
             plugin_path: self.plugin_path,
@@ -75,6 +87,8 @@ impl Args {
             cols: self.cols,
             rows: self.rows,
             dry_run: self.dry_run,
+            segment,
+            audio: self.audio,
         };
         job.validate()?;
         let backend = if self.raw || self.dry_run {
