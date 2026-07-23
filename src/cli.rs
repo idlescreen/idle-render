@@ -20,7 +20,7 @@ pub struct Args {
     pub plugin_path: Option<PathBuf>,
 
     /// RNG seed exported to plugins via IDLE_RENDER_SEED
-    #[arg(long, default_value_t = 0xC0FF_EEu64)]
+    #[arg(long, default_value_t = 0x00C0_FFEEu64)]
     pub seed: u64,
 
     /// Output timeline fps
