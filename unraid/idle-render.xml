@@ -1,0 +1,36 @@
+<?xml version="1.0"?>
+<Container version="2">
+  <Name>idle-render</Name>
+  <Repository>ghcr.io/idlescreen/idle-render:latest</Repository>
+  <Registry>https://ghcr.io/</Registry>
+  <Network>bridge</Network>
+  <Shell>sh</Shell>
+  <Privileged>false</Privileged>
+  <Support>https://github.com/idlescreen/idle-render</Support>
+  <Project>https://github.com/idlescreen/idle-render</Project>
+  <Overview>Offline IdleScreen effect renderer (export tooling). Prefer native packages on desktop hosts.</Overview>
+  <Category>MediaApp:Other Tools:</Category>
+  <WebUI/>
+  <TemplateURL/>
+  <Icon/>
+  <ExtraParams/>
+  <PostArgs/>
+  <CPUset/>
+  <DateInstalled/>
+  <DonateText/>
+  <DonateLink/>
+  <Description>Headless AV1 export for IdleScreen savers. Mount plugin and output volumes as needed.</Description>
+  <Networking>
+    <Mode>bridge</Mode>
+  </Networking>
+  <Data>
+    <Volume>
+      <HostDir>/mnt/user/appdata/idle-render/out</HostDir>
+      <ContainerDir>/out</ContainerDir>
+      <Mode>rw</Mode>
+    </Volume>
+  </Data>
+  <Environment/>
+  <Labels/>
+  <Config Name="Output" Target="/out" Default="/mnt/user/appdata/idle-render/out" Mode="rw" Description="Render output" Type="Path" Display="always" Required="true" Mask="false"/>
+</Container>

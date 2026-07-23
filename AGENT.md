@@ -1,8 +1,8 @@
-# AGENT.md — idle-render
+# AGENT.md — idle-render (Phase B contract)
 
 - Strict Rust, Apache-2.0.
 - Max 250 lines per `.rs` file.
 - Zero `.unwrap()` / `.expect()` in production code.
-- Prefer `std`; vetted crates only (clap, thiserror).
-- Path-deps sibling `idle-core` for trance-runner / plugin host.
-- Default branch: `master`. Commit and push after each barrier.
+- Prefer `std`; vetted crates only (clap, thiserror, tracing, proptest in dev).
+- Protocol/parsing logic must have proptest coverage.
+- Default branch: master. Commit after each hardening barrier.

@@ -15,7 +15,15 @@ pub fn mux_audio_bed(video: &Path, audio: &Path, output: &Path) -> Result<(), Re
     }
     let tmp = output.with_extension("mux.tmp.mkv");
     let out = Command::new("ffmpeg")
-        .args(["-hide_banner", "-loglevel", "error", "-y", "-stream_loop", "-1", "-i"])
+        .args([
+            "-hide_banner",
+            "-loglevel",
+            "error",
+            "-y",
+            "-stream_loop",
+            "-1",
+            "-i",
+        ])
         .arg(audio)
         .arg("-i")
         .arg(video)

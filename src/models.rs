@@ -1,4 +1,5 @@
 use crate::error::RenderError;
+use crate::paths::deny_parent_dirs;
 use std::path::PathBuf;
 use std::time::Duration;
 
@@ -77,6 +78,13 @@ impl RenderJob {
         }
         if self.output.as_os_str().is_empty() {
             return Err(RenderError::Job("output path required".into()));
+        }
+        deny_parent_dirs(&self.output, "output")?;
+        if let Some(p) = &self.plugin_path {
+            deny_parent_dirs(p, "plugin_path")?;
+        }
+        if let Some(a) = &self.audio {
+            deny_parent_dirs(a, "audio")?;
         }
         if let Some(seg) = self.segment {
             if seg.is_zero() {
