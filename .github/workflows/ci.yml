@@ -9,9 +9,28 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          path: idle-render
+      - uses: actions/checkout@v4
+        with:
+          repository: idlescreen/idle-core
+          path: idle-core
       - uses: dtolnay/rust-toolchain@stable
         with:
           components: rustfmt, clippy
-      - run: cargo fmt --all -- --check
-      - run: cargo clippy --all-targets -- -D warnings
-      - run: cargo test
+      - name: System deps
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libdbus-1-dev libwayland-dev libxkbcommon-dev libssl-dev pkg-config ffmpeg
+      - name: fmt
+        working-directory: idle-render
+        run: cargo fmt --all -- --check
+      - name: clippy
+        working-directory: idle-render
+        run: cargo clippy --all-targets -- -D warnings
+      - name: test
+        working-directory: idle-render
+        run: cargo test
+      - name: dry-run binary
+        working-directory: idle-render
+        run: cargo run -- --effect beams --duration 1s --dry-run -o /tmp/out.mkv
