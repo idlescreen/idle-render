@@ -3,9 +3,9 @@ use crate::encode::{encode_raw_bgra_to_file, EncodeBackend};
 use crate::error::RenderError;
 use crate::models::RenderJob;
 use crate::segment::{concat_segments, plan_segments};
+use idle_runner::plugin_session::PluginSession;
 use std::path::PathBuf;
 use std::time::Duration;
-use idle_runner::plugin_session::PluginSession;
 
 /// Outcome of a finished (or dry-run) pipeline.
 #[derive(Debug, Clone)]
