@@ -1,8 +1,8 @@
-# render
+# IdleScreen Renderer (`render`)
 
-Offline renderer for IdleScreen visual effects. Steps saver plugin math on a
-fixed timeline, rasterizes terminal cells to pixels, and encodes AV1 video with
-ffmpeg. No wall-clock screen capture.
+Offline renderer for **[IdleScreen](https://idlescreen.github.io)** visual effects.
+
+Website: **[https://idlescreen.github.io](https://idlescreen.github.io)**
 
 ## Why
 
