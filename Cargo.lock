@@ -620,16 +620,40 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "dfa686283ad6dd069f105e5ab091b04c62850d3e4cf5d67debad1933f55023df"
 
 [[package]]
-name = "render"
-version = "0.2.1"
+name = "idle-api"
+version = "2.3.0"
 dependencies = [
- "clap",
- "proptest",
+ "bytemuck",
+]
+
+[[package]]
+name = "idle-runner"
+version = "2.3.0"
+dependencies = [
+ "bytemuck",
+ "crossterm",
+ "fontdue",
+ "futures-lite",
+ "idle-api",
+ "idle-upscaler",
+ "landlock",
+ "libc",
+ "libloading 0.9.0",
+ "notify",
+ "sysinfo",
  "thiserror",
  "tracing",
  "tracing-subscriber",
- "trance-api",
- "trance-runner",
+ "wgpu",
+]
+
+[[package]]
+name = "idle-upscaler"
+version = "0.4.0"
+dependencies = [
+ "bytemuck",
+ "idle-api",
+ "tracing",
 ]
 
 [[package]]
@@ -1269,6 +1293,19 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d6f6ff9a378485b298a5286656da665ba74413d36db0979633275d2e708145d4"
 
 [[package]]
+name = "render"
+version = "0.2.2"
+dependencies = [
+ "clap",
+ "idle-api",
+ "idle-runner",
+ "proptest",
+ "thiserror",
+ "tracing",
+ "tracing-subscriber",
+]
+
+[[package]]
 name = "renderdoc-sys"
 version = "1.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1626,43 +1663,6 @@ dependencies = [
  "tracing-core",
  "tracing-log",
  "tracing-serde",
-]
-
-[[package]]
-name = "trance-api"
-version = "1.0.39"
-dependencies = [
- "bytemuck",
-]
-
-[[package]]
-name = "trance-runner"
-version = "1.0.39"
-dependencies = [
- "bytemuck",
- "crossterm",
- "fontdue",
- "futures-lite",
- "landlock",
- "libc",
- "libloading 0.9.0",
- "notify",
- "sysinfo",
- "thiserror",
- "tracing",
- "tracing-subscriber",
- "trance-api",
- "trance-upscaler",
- "wgpu",
-]
-
-[[package]]
-name = "trance-upscaler"
-version = "0.3.62"
-dependencies = [
- "bytemuck",
- "tracing",
- "trance-api",
 ]
 
 [[package]]

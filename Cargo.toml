@@ -1,6 +1,6 @@
 [package]
 name = "render"
-version = "0.2.1"
+version = "0.2.2"
 edition = "2021"
 license = "Apache-2.0"
 description = "Offline IdleScreen effect renderer — simulation to AV1 video"
@@ -28,8 +28,8 @@ thiserror = "2"
 tracing = "0.1"
 tracing-subscriber = { version = "0.3", features = ["env-filter"] }
 # Sibling engines
-trance-runner = { path = "../idle/trance-runner" }
-trance-api = { path = "../idle/trance-api" }
+idle-runner = { path = "../idle/idle-runner" }
+idle-api = { path = "../idle/idle-api" }
 
 [dev-dependencies]
 proptest = "1"

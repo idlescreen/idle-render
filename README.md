@@ -48,7 +48,7 @@ blocked by the live daemon Landlock profile.
 ## Safety
 
 Output, plugin, and audio paths must not contain `..` components. Prefer
-allowlisted effect names resolved by trance-runner discovery; use `--plugin-path`
+allowlisted effect names resolved by idle-runner discovery; use `--plugin-path`
 only for controlled builds.
 
 ## Related

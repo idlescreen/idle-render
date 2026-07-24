@@ -9,6 +9,6 @@
 
 ## Adversarial notes
 
-- Plugin load uses trance-runner allowlist when resolving by name
+- Plugin load uses idle-runner allowlist when resolving by name
 - Explicit --plugin-path is power-user; still rejects `..`
 - Segment concat uses ffmpeg demuxer with single-quoted escaped paths

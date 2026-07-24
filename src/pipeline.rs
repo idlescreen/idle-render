@@ -5,7 +5,7 @@ use crate::models::RenderJob;
 use crate::segment::{concat_segments, plan_segments};
 use std::path::PathBuf;
 use std::time::Duration;
-use trance_runner::plugin_session::PluginSession;
+use idle_runner::plugin_session::PluginSession;
 
 /// Outcome of a finished (or dry-run) pipeline.
 #[derive(Debug, Clone)]
@@ -16,7 +16,7 @@ pub struct PipelineResult {
     pub segments: u32,
 }
 
-/// Export seed env vars so plugins using [`trance_api::LcgRng::from_env_or_random`] match.
+/// Export seed env vars so plugins using [`idle_api::LcgRng::from_env_or_random`] match.
 pub fn export_seed_env(seed: u64) {
     // SAFETY: single-threaded CLI before plugin load; values are numeric strings.
     unsafe {
@@ -35,7 +35,7 @@ fn resolve_plugin(job: &RenderJob) -> Result<PluginSession, RenderError> {
     }
     PluginSession::load_with_options(
         &job.effect,
-        &trance_runner::launcher::LaunchMode::Preview,
+        &idle_runner::launcher::LaunchMode::Preview,
         Some(false),
         Some(1.0),
     )
