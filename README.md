@@ -12,12 +12,12 @@ produced without leaving a display running overnight.
 
 ## Install and build
 
-Requires a sibling checkout of idle-core for path dependencies:
+Requires the idle engine checked out into `./idle` for path dependencies:
 
 ```bash
-git clone https://github.com/idlescreen/idle-core.git
 git clone https://github.com/idlescreen/render.git
 cd render
+git clone https://github.com/idlescreen/idle.git idle
 cargo build --release
 ```
 
@@ -55,7 +55,7 @@ only for controlled builds.
 
 | Project | Role |
 |---------|------|
-| idle-core | Daemon, plugin API, CLI |
+| idle | Daemon, plugin API, CLI |
 | app-studio | Job queue and Director TUI |
 | saver-* | Official effects |
 | packages | APT/DNF host |

@@ -28,8 +28,8 @@ thiserror = "2"
 tracing = "0.1"
 tracing-subscriber = { version = "0.3", features = ["env-filter"] }
 # Sibling engines
-idle-runner = { path = "../idle/idle-runner" }
-idle-api = { path = "../idle/idle-api" }
+idle-runner = { path = "idle/idle-runner" }
+idle-api = { path = "idle/idle-api" }
 
 [dev-dependencies]
 proptest = "1"
