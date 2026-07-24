@@ -1,10 +1,10 @@
 [package]
-name = "idle-render"
+name = "render"
 version = "0.2.1"
 edition = "2021"
 license = "Apache-2.0"
 description = "Offline IdleScreen effect renderer — simulation to AV1 video"
-repository = "https://github.com/idlescreen/idle-render"
+repository = "https://github.com/idlescreen/render"
 readme = "README.md"
 keywords = ["idlescreen", "screensaver", "av1", "render"]
 categories = ["command-line-utilities", "multimedia"]
@@ -13,6 +13,11 @@ categories = ["command-line-utilities", "multimedia"]
 name = "idle_render"
 path = "src/lib.rs"
 
+[[bin]]
+name = "render"
+path = "src/main.rs"
+
+# Transitional legacy binary name.
 [[bin]]
 name = "idle-render"
 path = "src/main.rs"
@@ -30,7 +35,7 @@ trance-api = { path = "../idle-core/trance-api" }
 proptest = "1"
 
 [package.metadata.deb]
-name = "idle-render"
+name = "render"
 maintainer = "IdleScreen <jerydleuck@gmail.com>"
 copyright = "2026 IdleScreen"
 extended-description = "Offline IdleScreen effect renderer (ffmpeg AV1)."
@@ -38,5 +43,6 @@ depends = "libc6, ffmpeg"
 section = "utils"
 priority = "optional"
 assets = [
+    ["target/release/render", "usr/bin/render", "755"],
     ["target/release/idle-render", "usr/bin/idle-render", "755"]
 ]

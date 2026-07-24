@@ -1,4 +1,4 @@
-//! idle-render — offline IdleScreen exporter.
+//! render — offline IdleScreen exporter.
 
 use clap::Parser;
 use idle_render::cli::Args;
@@ -17,7 +17,7 @@ fn main() -> ExitCode {
     let (job, backend) = match args.into_job() {
         Ok(v) => v,
         Err(e) => {
-            eprintln!("idle-render: {e}");
+            eprintln!("render: {e}");
             return ExitCode::from(2);
         }
     };
@@ -39,7 +39,7 @@ fn main() -> ExitCode {
     match run_pipeline(&job, backend) {
         Ok(r) => {
             eprintln!(
-                "idle-render: wrote {} frame(s) in {} segment(s) to {}{}",
+                "render: wrote {} frame(s) in {} segment(s) to {}{}",
                 r.frames,
                 r.segments,
                 r.output.display(),
@@ -48,7 +48,7 @@ fn main() -> ExitCode {
             ExitCode::SUCCESS
         }
         Err(e) => {
-            eprintln!("idle-render: {e}");
+            eprintln!("render: {e}");
             ExitCode::from(1)
         }
     }

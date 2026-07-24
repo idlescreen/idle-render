@@ -1,4 +1,4 @@
-# Architecture — idle-render (Build 0)
+# Architecture — render (Build 0)
 
 ## Goal
 
@@ -32,5 +32,5 @@ RenderJob
 ## Invariants
 
 - Frame count = floor(duration_secs * fps) (at least 1 if duration > 0).
-- Seed is exported as `IDLE_RENDER_SEED` / `TRANCE_SEED` for plugins that honor it.
+- Seed is exported as `IDLESCREEN_RENDER_SEED` / `TRANCE_SEED` for plugins that honor it.
 - Encoder must be one of: libsvtav1, libaom-av1, librav1e, or raw null sink for tests.

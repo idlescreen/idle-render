@@ -1,4 +1,4 @@
-# idle-render
+# render
 
 Offline renderer for IdleScreen visual effects. Steps saver plugin math on a
 fixed timeline, rasterizes terminal cells to pixels, and encodes AV1 video with
@@ -16,8 +16,8 @@ Requires a sibling checkout of idle-core for path dependencies:
 
 ```bash
 git clone https://github.com/idlescreen/idle-core.git
-git clone https://github.com/idlescreen/idle-render.git
-cd idle-render
+git clone https://github.com/idlescreen/render.git
+cd render
 cargo build --release
 ```
 
@@ -28,20 +28,20 @@ with an AV1 encoder (`libsvtav1` preferred).
 
 ```bash
 # Plan only
-idle-render --effect beams --duration 10s --seed 1 --dry-run -o /tmp/out.mkv
+render --effect beams --duration 10s --seed 1 --dry-run -o /tmp/out.mkv
 
 # Encode (plugin installed or --plugin-path)
-idle-render --effect beams --duration 5s --fps 30 \
+render --effect beams --duration 5s --fps 30 \
   --width 1280 --height 720 --seed 0xC0FFEE -o /tmp/beams.mkv
 
 # Long encode in one-hour segments, then concat
-idle-render --effect storm --duration 8h --segment 1h -o /tmp/night.mkv
+render --effect storm --duration 8h --segment 1h -o /tmp/night.mkv
 
 # Optional looping audio bed
-idle-render --effect beams --duration 10m --audio bed.mp3 -o /tmp/with-audio.mkv
+render --effect beams --duration 10m --audio bed.mp3 -o /tmp/with-audio.mkv
 ```
 
-Seed is exported as `IDLE_RENDER_SEED` and `TRANCE_SEED` for plugins that honor
+Seed is exported as `IDLESCREEN_RENDER_SEED` and `TRANCE_SEED` for plugins that honor
 deterministic RNG. Export sets `TRANCE_DISABLE_SANDBOX=1` so frame output is not
 blocked by the live daemon Landlock profile.
 
@@ -56,7 +56,7 @@ only for controlled builds.
 | Project | Role |
 |---------|------|
 | idle-core | Daemon, plugin API, CLI |
-| idle-studio | Job queue and Director TUI |
+| app-studio | Job queue and Director TUI |
 | saver-* | Official effects |
 | packages | APT/DNF host |
 

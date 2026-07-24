@@ -7,7 +7,7 @@ use std::path::PathBuf;
 
 #[derive(Debug, Parser)]
 #[command(
-    name = "idle-render",
+    name = "render",
     about = "Offline IdleScreen effect renderer (saver math → AV1)"
 )]
 pub struct Args {
@@ -19,7 +19,7 @@ pub struct Args {
     #[arg(long)]
     pub plugin_path: Option<PathBuf>,
 
-    /// RNG seed exported to plugins via IDLE_RENDER_SEED
+    /// RNG seed exported to plugins via RENDER_SEED / IDLE_RENDER_SEED / TRANCE_SEED
     #[arg(long, default_value_t = 0x00C0_FFEEu64)]
     pub seed: u64,
 

@@ -20,6 +20,8 @@ pub struct PipelineResult {
 pub fn export_seed_env(seed: u64) {
     // SAFETY: single-threaded CLI before plugin load; values are numeric strings.
     unsafe {
+        // Dual names: historical TRANCE_SEED / IDLE_RENDER_SEED + product RENDER_SEED.
+        std::env::set_var("RENDER_SEED", seed.to_string());
         std::env::set_var("IDLE_RENDER_SEED", seed.to_string());
         std::env::set_var("TRANCE_SEED", seed.to_string());
         std::env::set_var("TRANCE_DISABLE_SANDBOX", "1");
