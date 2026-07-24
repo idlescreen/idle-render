@@ -32,4 +32,4 @@ jobs:
       - name: test
         run: cargo test
       - name: dry-run binary
-        run: cargo run -- --effect beams --duration 1s --dry-run -o /tmp/out.mkv
+        run: cargo run --bin render -- --effect beams --duration 1s --dry-run -o /tmp/out.mkv
